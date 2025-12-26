@@ -1,9 +1,7 @@
 export default async function handler(req, res) {
   try {
-    const apiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2NhdGlvbl9pZCI6Imc4M05JQmlyYzZQM25IcmQ3alVjIiwidmVyc2lvbiI6MSwiaWF0IjoxNzMzNTMyMTU3MTY3LCJzdWIiOiJMS0huNkVoZW10bmFBNExYOHBCZyJ9.dyxMeIUoETI5tG8QMmmavrhZiXe_yLDx4mXa5NACDH8";
-    const locationId = "g83NJBirc6P3nHrd7jUc";
-    const baseUrl = "https://services.leadconnectorhq.com/";
-
+    const apiKey = "YOUR_LOCATION_API_KEY"; // replace
+    const locationId = "YOUR_LOCATION_ID"; // replace
     const { query } = req.query;
 
     if (!query) {
@@ -11,12 +9,11 @@ export default async function handler(req, res) {
     }
 
     const ghlResponse = await fetch(
-      `${baseUrl}contacts/?locationId=${locationId}&query=${encodeURIComponent(query)}`,
+      `https://api.gohighlevel.com/v1/contacts/?locationId=${locationId}&query=${encodeURIComponent(query)}`,
       {
         method: "GET",
         headers: {
           Authorization: `Bearer ${apiKey}`,
-          Version: "2021-07-28",
           Accept: "application/json",
         },
       }
@@ -24,10 +21,9 @@ export default async function handler(req, res) {
 
     const text = await ghlResponse.text();
 
-    // 🔍 DEBUG: return raw response if not JSON
     if (!text.startsWith("{")) {
       return res.status(500).json({
-        error: "GHL did not return JSON",
+        error: "GHL returned non-JSON response",
         rawResponse: text.substring(0, 500),
       });
     }
@@ -49,11 +45,7 @@ export default async function handler(req, res) {
       studentId: contact["contact.student_id_"] || "N/A",
       enrolledCourses: contact["contact.enrolled_courses"] || "N/A",
     });
-
   } catch (err) {
-    return res.status(500).json({
-      error: "Server crashed",
-      details: err.message,
-    });
+    return res.status(500).json({ error: "Server crashed", details: err.message });
   }
 }
