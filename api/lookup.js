@@ -1,6 +1,6 @@
 export default async function handler(req, res) {
   try {
-    const apiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2NhdGlvbl9pZCI6Imc4M05JQmlyYzZQM25IcmQ3alVjIiwidmVyc2lvbiI6MSwiaWF0IjoxNzMzNTMyMTU3MTY3LCJzdWIiOiJMS0huNkVoZW10bmFBNExYOHBCZyJ9.dyxMeIUoETI5tG8QMmmavrhZiXe_yLDx4mXa5NACDH8";
+    const apiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2NhdGlvbl9pZCI6Imc4M05JQmlyYzZQM25IcmQ3alVjIiwidmVyc2lvbiI6MSwiaWF0IjoxNzY2NzUyODY2MjA0LCJzdWIiOiJTS0x3YUJRWXhLRlhScGhIR1RxMiJ9.L7o2yUekjbPmJATR-eiUUY4istV64_ipRmBLPlA7pq4";
     const locationId = "g83NIBirc6P3nHrd7jUc";
     const baseUrl = "https://api.gohighlevel.com/v1/";
     const { query } = req.query;
@@ -26,3 +26,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: err.message });
   }
 }
+
