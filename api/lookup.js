@@ -8,40 +8,32 @@ export default async function handler(req, res) {
       return res.json({ found: false, message: "No query provided" });
     }
 
-    let searchUrl = "";
-
-    // Detect input type
-    if (query.includes("@")) {
-      // Email search
-      searchUrl = `${baseUrl}contacts/search?email=${encodeURIComponent(query)}`;
-    } else if (/^\d+$/.test(query)) {
-      // Phone search
-      searchUrl = `${baseUrl}contacts/search?phone=${encodeURIComponent(query)}`;
-    } else {
-      // Student ID (custom field → requires full contacts fetch)
-      searchUrl = `${baseUrl}contacts/`;
-    }
-
-    const response = await fetch(searchUrl, {
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        Accept: "application/json"
+    // ✅ SINGLE VALID GHL SEARCH
+    const response = await fetch(
+      `${baseUrl}contacts/?query=${encodeURIComponent(query)}`,
+      {
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          Accept: "application/json",
+        },
       }
-    });
+    );
 
     const data = await response.json();
 
+    if (!data.contacts || data.contacts.length === 0) {
+      return res.json({ found: false });
+    }
+
     let contact = null;
 
-    if (data.contacts && data.contacts.length) {
-      if (!query.includes("@") && !/^\d+$/.test(query)) {
-        // Manually match student ID
-        contact = data.contacts.find(
-          c => c["contact.student_id_"] === query
-        );
-      } else {
-        contact = data.contacts[0];
-      }
+    // 🔎 If looks like Student ID → manual match
+    if (!query.includes("@") && !query.startsWith("+") && !/^\d{10,}$/.test(query)) {
+      contact = data.contacts.find(
+        c => c["contact.student_id_"] === query
+      );
+    } else {
+      contact = data.contacts[0];
     }
 
     if (!contact) {
@@ -55,11 +47,9 @@ export default async function handler(req, res) {
       email: contact.email || "N/A",
       phone: contact.phone || "N/A",
       studentId: contact["contact.student_id_"] || "N/A",
-      enrolledCourses: contact["contact.enrolled_courses"] || "N/A"
+      enrolledCourses: contact["contact.enrolled_courses"] || "N/A",
     });
 
   } catch (err) {
-    return res.status(500).json({ error: err.message });
-  }
-}
-
+    return res.status(500).json({
+      e
