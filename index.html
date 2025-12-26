@@ -3,74 +3,50 @@
 <head>
   <title>GHL Student Lookup</title>
   <style>
-    body {
-      font-family: Arial;
-      padding: 40px;
-      max-width: 500px;
-      margin: auto;
-    }
-    input {
-      width: 100%;
-      padding: 12px;
-      font-size: 16px;
-      margin-bottom: 10px;
-    }
-    button {
-      padding: 12px;
-      width: 100%;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    #result {
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 8px;
-      background: #f1f1f1;
-    }
+    body { font-family: Arial; padding: 40px; max-width: 500px; margin: auto; }
+    input { width: 100%; padding: 12px; font-size: 16px; margin-bottom: 10px; }
+    button { padding: 12px; width: 100%; font-size: 16px; cursor: pointer; }
+    #result { margin-top: 20px; padding: 15px; border-radius: 8px; background: #f1f1f1; }
   </style>
 </head>
 <body>
 
 <h2>GHL Student Lookup Portal</h2>
-
 <input id="query" placeholder="Enter Email, Phone, or Student ID" />
-
 <button onclick="searchStudent()">Lookup</button>
-
 <div id="result"></div>
 
 <script>
 async function searchStudent() {
   const q = document.getElementById("query").value.trim();
-  if (!q) {
-    alert("Please enter email, phone, or student ID.");
-    return;
-  }
+  if (!q) { alert("Please enter email, phone, or student ID."); return; }
 
   document.getElementById("result").innerHTML = "Searching...";
 
-  const res = await fetch("/api/lookup?query=" + encodeURIComponent(q));
-  const data = await res.json();
+  try {
+    const res = await fetch("/api/lookup?query=" + encodeURIComponent(q));
+    const data = await res.json();
 
-  if (!data.found) {
+    if (!data.found) {
+      document.getElementById("result").innerHTML = `<strong>Student not found.</strong>`;
+      return;
+    }
+
     document.getElementById("result").innerHTML = `
-      <strong>Student not found.</strong>
+      <strong>Student Found:</strong><br><br>
+      <strong>ID:</strong> ${data.id}<br>
+      <strong>Name:</strong> ${data.name}<br>
+      <strong>Email:</strong> ${data.email}<br>
+      <strong>Phone:</strong> ${data.phone}<br>
+      <strong>Student ID:</strong> ${data.studentId}<br>
+      <strong>Enrolled Courses:</strong> ${data.enrolledCourses}
     `;
-    return;
+  } catch (err) {
+    document.getElementById("result").innerHTML = "Error fetching student info.";
+    console.error(err);
   }
-
-  document.getElementById("result").innerHTML = `
-    <strong>Student Found:</strong><br><br>
-    <strong>ID:</strong> ${data.id}<br>
-    <strong>Name:</strong> ${data.name}<br>
-    <strong>Email:</strong> ${data.email}<br>
-    <strong>Phone:</strong> ${data.phone}<br>
-    <strong>Student ID:</strong> ${data.studentId}<br>
-    <strong>Enrolled Courses:</strong> ${data.enrolledCourses}
-  `;
 }
 </script>
 
 </body>
 </html>
-
